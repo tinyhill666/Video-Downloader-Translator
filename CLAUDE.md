@@ -48,13 +48,25 @@ python .claude/skills/subtitle-translation/scripts/prepare_translation.py video.
 2. 全文一次性翻译（保持上下文连贯）
 3. 写入 `video.en.batches/translations.txt`
 
+**批次文件格式（带行号）：**
+```
+001→This programme contains strong language
+002→Bumworth! Bumworth!
+```
+
+**翻译输出格式（保留行号）：**
+```
+001→本节目包含粗口
+002→邦沃斯！邦沃斯！
+```
+
 **翻译要求：**
 - 口语化、自然
 - 保持语气、情感、幽默
 - 俚语意译，不直译
 - 人名一致（Chi=小琪）
 - 【大写】= 场景描述 → 【中文描述】
-- 每行对应一行，不合并不拆分
+- **严格保持行号对应，不合并不拆分**
 
 ### 3. 完成
 ```bash

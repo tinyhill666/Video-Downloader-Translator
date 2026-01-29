@@ -44,14 +44,17 @@ def main():
 
     print(f"分成 {batch_count} 批，每批 {args.batch_size} 行")
 
-    # 分批保存
+    # 分批保存（带全局行号前缀）
     for i in range(0, total, args.batch_size):
         batch_num = i // args.batch_size + 1
         batch_lines = all_lines[i:i + args.batch_size]
 
         batch_file = os.path.join(output_dir, f"batch_{batch_num:03d}.txt")
         with open(batch_file, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(batch_lines) + '\n')
+            # 每行添加全局行号前缀: "001→原文"
+            for j, line in enumerate(batch_lines):
+                global_line_num = i + j + 1  # 1-based
+                f.write(f"{global_line_num:03d}→{line}\n")
 
         print(f"  batch_{batch_num:03d}.txt ({len(batch_lines)} 行)")
 
