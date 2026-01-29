@@ -1,1 +1,8 @@
 .claude/.DS_Store
+.tmp/
+*.batches/
+*.ttml
+*.srt
+*.txt
+.DS_Store
+*.mp4

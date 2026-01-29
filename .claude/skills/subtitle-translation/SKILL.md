@@ -2,6 +2,7 @@
 name: subtitle-translation
 description: This skill should be used when translating subtitles, processing SRT/VTT/ASS files, creating bilingual subtitles, or reformatting subtitle layout. Provides translation principles, layout rules, and width calculation methods.
 version: 1.0.0
+allowed-tools: [Read, Write, Edit, Bash, Glob]
 ---
 
 # 字幕翻译技能
@@ -188,34 +189,58 @@ This is a very important message that everyone needs to understand clearly.
 
 ### Claude Code 用户（推荐）
 
-使用分步脚本，在对话中完成翻译：
-
 ```bash
 # 步骤1: 准备翻译批次
 python prepare_translation.py video.en.srt
 
-# 步骤2: 在 Claude Code 对话中翻译
-# 对话中会自动读取批次文件，逐批翻译并写入 translations.txt
+# 步骤2: 在对话中说「翻译 video.en.batches/」
+# Claude 自动并行翻译所有批次，无需确认
 
 # 步骤3: 合并生成双语字幕
 python finalize_translation.py video.en.batches/
 ```
 
-**流程说明：**
+**自动翻译流程：**
 
-1. `prepare_translation.py` 自动完成：
-   - 解析 SRT，清理标签
-   - 分批保存（默认每批 50 行）
-   - 生成 `video.en.batches/` 目录
+当用户说「翻译 xxx.batches/」时，Claude 会：
+1. 读取 metadata.json 获取批次信息
+2. **并行**启动多个 Task 代理翻译不同批次
+3. 自动将结果追加到 translations.txt
+4. 无需用户逐批确认
 
-2. 在对话中告诉 Claude：`翻译 video.en.batches/`
-   - Claude 会逐批读取、翻译、写入结果
-   - 上下文感知，保持角色名一致
+**翻译要求：**
+- 口语化、自然，符合中文表达习惯
+- 保持原文语气、情感和幽默感
+- 俚语和习语要意译，不要直译
+- 【大写文字】是场景描述，翻译成【中文描述】
+- 歌词(#开头)保持诗意
 
-3. `finalize_translation.py` 自动完成：
-   - 合并翻译结果
-   - 生僻词绿色高亮
-   - 生成 `video.ZH&EN.srt`
+**⚠️ 严格行对应规则（最重要）：**
+- **每行输入必须对应一行输出，绝对不能合并或拆分**
+- 即使英文句子跨越多行，每一行也必须单独翻译
+- 翻译输出的行数必须与输入行数完全相同
+
+**错误示例（绝对禁止）：**
+```
+输入第23行: But how am I supposed to find someone out there
+输入第24行: in this crazy goddamn messed up world?
+
+错误输出（合并了两行）:
+第23行: 可我怎样才能在这个疯狂的混乱世界里找到人呢？
+第24行: （缺失，导致后续全部错位！）
+```
+
+**正确示例：**
+```
+输入第23行: But how am I supposed to find someone out there
+输入第24行: in this crazy goddamn messed up world?
+
+正确输出（严格一对一）:
+第23行: 可我怎样才能在那里找到一个人呢
+第24行: 在这个疯狂的混乱世界里？
+```
+
+即使翻译看起来不完整或不通顺，也必须保持行数一致。字幕播放时会连续显示，观众能理解上下文。
 
 ### API 用户
 

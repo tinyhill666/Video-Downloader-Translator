@@ -51,7 +51,7 @@ def main():
 
         batch_file = os.path.join(output_dir, f"batch_{batch_num:03d}.txt")
         with open(batch_file, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(batch_lines))
+            f.write('\n'.join(batch_lines) + '\n')
 
         print(f"  batch_{batch_num:03d}.txt ({len(batch_lines)} 行)")
 
